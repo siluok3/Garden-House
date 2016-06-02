@@ -5,9 +5,9 @@ from pygame.locals import *
 import pygame.camera
 
 # setup cam
-pygame.init()
-pygame.camera.init()
-cam = pygame.camera.Camera("/dev/video0", (10000, 5000))
+#pygame.init()
+#pygame.camera.init()
+#cam = pygame.camera.Camera("/dev/video0", (10000, 5000))
 
 DHT_SENSOR   = 4 #DIGITAL PORT D4 (Temperature & Humidity Sensor Pro)
 WATER_SENSOR = 2 #DIGITAL PORT D2 (Water Sensor)
@@ -46,10 +46,10 @@ while True:
            print "WATER ERROR"
 
         # Grab Picture #
-        cam.start()
-        image = cam.get_image()
-        pygame.image.save(image, '101.jpg')
-        cam.stop()        
+        # cam.start()
+        # image = cam.get_image()
+        # pygame.image.save(image, '101.jpg')
+        # cam.stop()        
 
         # Sleep #
         time.sleep(10)
