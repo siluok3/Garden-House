@@ -10,7 +10,8 @@ from threading import Thread
 temp = "NULL"
 humidity = "NULL"
 water = "NULL"
-bindata = 0
+bindata = None
+bin_done = False
 
 class MyServerProtocol(WebSocketServerProtocol):
 
@@ -23,16 +24,22 @@ class MyServerProtocol(WebSocketServerProtocol):
         #self.sendMessage("", False)
                 
     def onMessage(self, payload, isBinary):
-        global temp, humidity, water;
+        global temp, humidity, water, bindata, bin_done;
 
         if isBinary:
             print("Binary message received: {} bytes\n".format(len(payload)))
         else:
             print("Text message received: {}\n".format(payload.decode('utf8')))
             # echo back message verbatim
-            self.sendMessage(temp, False)
-            self.sendMessage(humidity, False)
-            self.sendMessage(water, False)
+            try:
+                if bin_done:
+                    bin_done = False
+                    self.sendMessage(bindata, True)
+                    self.sendMessage(temp, False)
+                    self.sendMessage(humidity, False)
+                    self.sendMessage(water, False)
+            except AssertionError:
+                pass
 
     def onClose(self, wasClean, code, reason):
         #print("WebSocket connection closed: {}\n".format(reason))
@@ -46,7 +53,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 
 
 def func(i):
-    global temp, humidity, water, bindata;
+    global temp, humidity, water, bindata, bin_done;
 
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,20 +76,53 @@ def func(i):
             print >>sys.stderr, 'connection from', client_address
         
             while True:
-                print "AWAITING DATA"
-                #bindata  = connection.recv(70000)
-                #print "got bindata"
-                temp     = connection.recv(32)
+                data_size = connection.recv(32)
+                uni_data_size = unicode(data_size, errors='ignore')
+
+                if (data_size == ''):
+                    continue
+
+                print 'data size = ' + data_size
+
+                bindata = connection.recv( int(data_size) )
+                print 'Got bindata size: ' + str(len(bindata))
+                total = len(bindata)
+
+                while True:
+                    if int(total) == int(data_size):
+                        print 'breaking w total of : ' + str(total)
+                        bin_done = True
+                        break
+
+                    new_data = connection.recv( int(str(data_size)) )
+                    bindata += new_data
+                    print 'Got bindata size: ' + str(len(new_data))
+                    total += len(new_data)
+                
+                time.sleep(5)
+
+                '''
+                bindata += connection.recv(10000)
+                bindata += connection.recv(10000)
+                bindata += connection.recv(10000)
+                bindata += connection.recv(10000)
+                bindata += connection.recv(10000)
+                bindata += connection.recv(10000)
+                '''
+
+                #bindata += connection.recv(60000)
+                #print "got bindata 2"
+                #temp     = connection.recv(32)
                 #print "got temp"
-                humidity = connection.recv(32)
+                #humidity = connection.recv(32)
                 #print "got hum"
-                water    = connection.recv(32)
+                #water    = connection.recv(32)
                 #print "got water"
                 #time.sleep(5)
                 #print >>sys.stderr, 'received "%s"' % bindata
-                print >>sys.stderr, 'received "%s"' % temp
-                print >>sys.stderr, 'received "%s"' % humidity
-                print >>sys.stderr, 'received "%s"' % water
+                #print >>sys.stderr, 'received "%s"' % temp
+                #print >>sys.stderr, 'received "%s"' % humidity
+                #print >>sys.stderr, 'received "%s"' % water
                 
             #if data:
             #    print >>sys.stderr, 'sending data back to the client'
@@ -90,7 +130,11 @@ def func(i):
             #else:
             #    print >>sys.stderr, 'no more data from', client_address
             #    break
-            
+        #except ValueError:
+            #pass
+        #except UnicodeDecodeError:
+            #pass
+                
         finally:
             print "finally"
             #Clean up the connection

@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<link rel="stylesheet" type="text/css" href="home_style.css">
 
-	<script type="text/javascript" src="garden.js"></script>
+	<script type="text/javascript" src="garden.js" defer></script>
     </head>
     
     <body>		
@@ -40,26 +40,25 @@
 	</p>
 
 	<div id="sensors">
-	  <table>
+	  <table id="data">
 	    <tr>
-	      <td>Humidity:</td>
-	      <td></td>
+	      <td>Temperature:</td>
+	      <td id="temperature">NULL</td>
 	    </tr>
 
 	    <tr>
-	      <td>Temperature:</td>
-	      <td></td>
+	      <td>Humidity:</td>
+	      <td id="humidity">NULL</td>
 	    </tr>
 
 	    <tr>
 	      <td>Water Present:</td>
-	      <td></td>
+	      <td id="water">NULL</td>
 	    </tr>
 	</div>
 
-	<input type="text" name="humidity_value" hidden="true"><br>
-	<input type="text" name="temperature_value" hidden="true"><br>	
-	<input type="text" name="water_value" hidden="true"><br>
+	<input type="text" name="temperature_value" hidden="false">
+	<input type="text" name="water_value" hidden="false">
 
     </body>
 </html>
