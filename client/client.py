@@ -35,28 +35,18 @@ image = cam.get_image()
 pygame.image.save(image, '101.jpg')
 cam.stop()        
 
-#fileContent = None
-#print("Hello")
-#with open("101.jpg", mode='rb') as file: # b is important -> binary
-#    fileContent = file.read()
-    
-#sock.send(str(len(fileContent)))
-#sent = sock.send(fileContent)
-#print('File content length: ' + str(len(fileContent)))
-#print('sent ' + str(sent))
-
 while True:
     try:
         # Grab temp in C and Humidity in %/100 #
-        #[temp, humidity] = grovepi.dht(DHT_SENSOR, WHITE)
+        [temp, humidity] = grovepi.dht(DHT_SENSOR, WHITE)
         
         # convert to F from C
-        #tempint = ((temp*1.8) + 32)
+        tempint = ((temp*1.8) + 32)
 
         #print("DHT: %.02f , %.02f%%" % (temp, humidity))
 
         # Grab temp in F #
-        #analog_temp = ( grovepi.temp(TEMP_SENSOR, '1.2')*1.8 ) + 32
+        analog_temp = ( grovepi.temp(TEMP_SENSOR, '1.2')*1.8 ) + 32
 
         #print("Temperature Sensor: ", temp)
 
@@ -89,7 +79,8 @@ while True:
         print('sent ' + str(sent))
 
         #sendem after collection so no IOERROR problems
-        #sock.sendall( str(tempint) )
+        time.sleep(5)
+        sock.sendall( str(tempint) )
         #time.sleep(1)
         #sock.sendall( str(humidity) )
         #time.sleep(1)
