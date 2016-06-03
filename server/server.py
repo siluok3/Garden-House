@@ -77,7 +77,8 @@ def func(i):
         
             while True:
                 data_size = connection.recv(32)
-                uni_data_size = unicode(data_size, errors='ignore')
+                data_size.encode('utf-8').strip()
+                data_size = unicode(data_size, errors='ignore')
 
                 if (data_size == ''):
                     continue
@@ -98,27 +99,16 @@ def func(i):
                     bindata += new_data
                     print 'Got bindata size: ' + str(len(new_data))
                     total += len(new_data)
-                
-                time.sleep(5)
+                    print 'total is ' + str(total)                
 
-                '''
-                bindata += connection.recv(10000)
-                bindata += connection.recv(10000)
-                bindata += connection.recv(10000)
-                bindata += connection.recv(10000)
-                bindata += connection.recv(10000)
-                bindata += connection.recv(10000)
-                '''
-
-                #bindata += connection.recv(60000)
-                #print "got bindata 2"
-                #temp     = connection.recv(32)
-                #print "got temp"
+                temp     = connection.recv(32)
+                print "got temp"
                 #humidity = connection.recv(32)
                 #print "got hum"
                 #water    = connection.recv(32)
                 #print "got water"
-                #time.sleep(5)
+                time.sleep(5)
+
                 #print >>sys.stderr, 'received "%s"' % bindata
                 #print >>sys.stderr, 'received "%s"' % temp
                 #print >>sys.stderr, 'received "%s"' % humidity
