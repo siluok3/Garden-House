@@ -9,7 +9,9 @@ from threading import Thread
 
 temp = "NULL"
 humidity = "NULL"
+moisture = "NULL"
 water = "NULL"
+
 bindata = None
 bin_done = False
 
@@ -24,7 +26,7 @@ class MyServerProtocol(WebSocketServerProtocol):
         #self.sendMessage("", False)
                 
     def onMessage(self, payload, isBinary):
-        global temp, humidity, water, bindata, bin_done;
+        global temp, humidity, moisture, water, bindata, bin_done;
 
         if isBinary:
             print("Binary message received: {} bytes\n".format(len(payload)))
@@ -37,6 +39,7 @@ class MyServerProtocol(WebSocketServerProtocol):
                     self.sendMessage(bindata, True)
                     self.sendMessage(temp, False)
                     self.sendMessage(humidity, False)
+                    self.sendMessage(moisture, False)
                     self.sendMessage(water, False)
             except AssertionError:
                 pass
@@ -53,7 +56,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 
 
 def func(i):
-    global temp, humidity, water, bindata, bin_done;
+    global temp, humidity, moisture, water, bindata, bin_done;
 
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,7 +79,7 @@ def func(i):
             print >>sys.stderr, 'connection from', client_address
         
             while True:
-                data_size = connection.recv(32)
+                data_size = connection.recv(128)
                 data_size.encode('utf-8').strip()
                 data_size = unicode(data_size, errors='ignore')
 
@@ -103,10 +106,18 @@ def func(i):
 
                 temp     = connection.recv(32)
                 print "got temp"
-                #humidity = connection.recv(32)
-                #print "got hum"
-                #water    = connection.recv(32)
-                #print "got water"
+                time.sleep(1)
+
+                humidity = connection.recv(32)
+                print "got hum"
+                time.sleep(1)
+
+                moisture = connection.recv(32)
+                print "Got Moisture"
+                time.sleep(1)
+
+                water    = connection.recv(32)
+                print "got water"
                 time.sleep(5)
 
                 #print >>sys.stderr, 'received "%s"' % bindata
