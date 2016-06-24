@@ -5,10 +5,25 @@ from pygame.locals import *
 import pygame.camera
 import socket
 
+MOIST_SENSOR = 1
+
+'''
+while True:
+    try:
+        print(grovepi.analogRead(MOIST_SENSOR))
+        time.sleep(.5)
+
+    except KeyboardInterrupt:
+        break
+    except IOError:
+        print ("Error")
+'''
+
 # setup cam
 pygame.init()
 pygame.camera.init()
-cam = pygame.camera.Camera("/dev/video0", (10000, 5000))
+#cam = pygame.camera.Camera("/dev/video0", (10000, 5000))
+cam = pygame.camera.Camera("/dev/video0", (10000, 10000))
 
 DHT_SENSOR   = 4 #DIGITAL PORT D4 (Temperature & Humidity Sensor Pro)
 WATER_SENSOR = 2 #DIGITAL PORT D2 (Water Sensor)
@@ -29,11 +44,14 @@ server_address = ('poorhackers.com', 9001)
 print >>sys.stderr, 'connecting to %s port %s' % server_address
 sock.connect(server_address)
 
+cam.start()
+'''
 # Grab Picture #
 cam.start()
 image = cam.get_image()
 pygame.image.save(image, '101.jpg')
 cam.stop()        
+'''
 
 while True:
     try:
@@ -51,7 +69,7 @@ while True:
         #print("Temperature Sensor: ", temp)
 
         # Grab Water Present as boolean #
-        #water = grovepi.digitalRead(WATER_SENSOR)
+        water = grovepi.digitalRead(WATER_SENSOR)
         #print("Water Present: ")
 
         #if (water == 1):
@@ -62,18 +80,19 @@ while True:
            #print "WATER ERROR"
 
         # Grab Picture #
-        cam.start()
+        #cam.start()
         image = cam.get_image()
         pygame.image.save(image, '101.jpg')
-        cam.stop()        
+        #cam.stop()        
 
         fileContent = None
-        print("Hello")
 
         with open("101.jpg", mode='rb') as file: #b is important -> binary
             fileContent = file.read()
-    
-        sock.send(str(len(fileContent)))
+
+        str_thing = str(len(fileContent))
+        sock.send( str_thing )
+        time.sleep(2)
         sent = sock.send(fileContent)
         print('File content length: ' + str(len(fileContent)))
         print('sent ' + str(sent))
@@ -81,14 +100,15 @@ while True:
         #sendem after collection so no IOERROR problems
         time.sleep(5)
         sock.sendall( str(tempint) )
-        #time.sleep(1)
-        #sock.sendall( str(humidity) )
-        #time.sleep(1)
-        #sock.sendall( str(water) )        
-        #time.sleep(1)
+        time.sleep(3)
+        sock.sendall( str(humidity) )
+        time.sleep(3)
+        sock.sendall( str(grovepi.analogRead(MOIST_SENSOR)) )
+        time.sleep(3)
+        sock.sendall( str(water) )        
 
         # Sleep #
-        time.sleep(5)
+        time.sleep(3)
 
     except KeyboardInterrupt:
         break
